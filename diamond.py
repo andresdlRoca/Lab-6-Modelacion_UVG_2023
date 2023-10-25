@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 
 # Algoritmo diamante cuadrado
 def diamond_square(size, roughness):
-    n = size - 1 # Valor maximo de la matriz terrain
+    n = size - 2 # Valor maximo de la matriz terrain
     terrain = np.zeros((size, size), dtype=float)
 
     # Valores iniciales de las cuatro esquinas de la matriz con valores aleatorios entre 0 y 1
@@ -37,7 +37,7 @@ def diamond_square(size, roughness):
     terrain[n, n] = np.random.uniform(0, 1)
 
     step = n # Tamaño inicial del paso
-    scale = 1.0 # Control de la magnitud de la perturbacion aleatoria
+    scale = 5 # Control de la magnitud de la perturbacion aleatoria
 
     # Bucle mientras el paso sea mayor que 1
     while step > 1:
@@ -50,14 +50,24 @@ def diamond_square(size, roughness):
             for x in range(half, n, step):
                 avg = (terrain[y - half, x - half] + terrain[y - half, x + half] +
                        terrain[y + half, x - half] + terrain[y + half, x + half]) / 4
-                terrain[y, x] = avg + np.random.uniform(-scale, scale) # Punto medio del cuadrado
+                # terrain[y, x] = avg + np.random.uniform(-scale, scale) # Punto medio del cuadrado
+                terrain[y, x] = avg + np.random.uniform(0, scale) # Punto medio del cuadrado
 
         # Recorren los diamantes de la matriz en cada iteracion y calculan el valor promedio
         # NOTA: Esto simula la interpolacion de alturas en los centros de los cuadrados
         for y in range(0, n + 1, step):
             for x in range(half, n, step):
                 avg = (terrain[y, x - half] + terrain[y, x + half]) / 2
-                terrain[y, x] = avg + np.random.uniform(-scale, scale) # Punto medio del diamante
+                terrain[y, x] = avg + np.random.uniform(0, scale)
+
+        # print(avg)
+
+        for y in range(half, n, step):
+            for x in range(0, n + 1, step):
+                avg = (terrain[y - half, x] + terrain[y + half, x]) / 2
+                terrain[y, x] = avg + np.random.uniform(0, scale)
+
+        # print(avg)
 
         # Se reduce el paso y la magnitud de la rugosidad para la siguiente iteracion
         step = half
@@ -66,10 +76,12 @@ def diamond_square(size, roughness):
     return terrain
 
 
-size = 9  # Tamaño de la matriz (debe ser 2^n + 1)
+size = 10  # Tamaño de la matriz (debe ser 2^n + 1)
 roughness = 0.5 # Rugosidad del terreno
 
 terrain = diamond_square(size, roughness)
+
+print(terrain)
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
